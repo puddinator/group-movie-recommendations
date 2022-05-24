@@ -1,0 +1,10 @@
+cs50
+Flask
+Flask-Session
+requests
+datetime
+
+bs4
+selenium
+webdriver_manager
+

@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+    {% for which in range(names|length) %}
+        <div class="container">
+            <div class="row justify-content-center">
+
+                <div class="col-md-8 col-lg-6 col-xl-4">
+                    <div class="card">
+                        <img src="{{ infos[which]["imageurl"] }}" alt="{{ names[which] }}"/>
+                    </div>
+                </div>
+
+                <div class="col-md-8 col-lg-6 col-xl-4">
+                    <div class="card text-black">                 
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h5 class="card-title">
+                                    <a href=" {{ infos[which]["url"] }} " target="_blank">{{ names[which] }}</a>
+                                </h5>
+                                <p class="text-muted mb-4">Price History</p>
+                            </div>
+                            <div><canvas id="{{ 'a' + which|string }}"></canvas></div>
+                            <script>
+                                // define the chart data
+                                var chartData = {
+                                labels : [{% for item in graphs[which] %}
+                                "{{ item["date"] }}",
+                                {% endfor %}],
+                                datasets : [{
+                                label: 'Price',
+                                fill: true,
+                                lineTension: 0.1,
+                                backgroundColor: "rgba(75,192,192,0.4)",
+                                borderColor: "rgba(75,192,192,1)",
+                                borderCapStyle: 'butt',
+                                borderDash: [],
+                                borderDashOffset: 0.0,
+                                borderJoinStyle: 'miter',
+                                pointBorderColor: "rgba(75,192,192,1)",
+                                pointBackgroundColor: "#fff",
+                                pointBorderWidth: 1,
+                                pointHoverRadius: 5,
+                                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                                pointHoverBorderColor: "rgba(220,220,220,1)",
+                                pointHoverBorderWidth: 2,
+                                pointRadius: 1,
+                                pointHitRadius: 10,
+                                data : [{% for item in graphs[which] %}
+                                {{ item["price"] }},
+                                {% endfor %}],
+                                spanGaps: false
+                                }]
+                                }
+                                // get chart canvas
+                                var ctx = document.getElementById("{{ 'a' + which|string }}").getContext("2d");
+                                // create the chart using the chart canvas
+                                var {{ 'a' + which|string }} = new Chart(ctx, {
+                                type: 'line',
+                                data: chartData,
+                                });
+                            </script>
+                            
+                            <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                                <span>Current price alert: </span>
+                                <span> 
+                                    {{ trackedprices[which]["price"] | usd }}
+                                </span>
+                            </div>
+
+                            <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                                <span>Update price alert: </span>
+                                <span> 
+                                    <form id="trackform" action="/" method="post">
+                                        <div class="col-xs-2">
+                                            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="price" name="price" placeholder="Price" type="text">
+                                            <input type="hidden" name="name" value="{{ names[which] }}" />
+                                        </div>
+                                    </form>
+                                </span>
+                            </div>
+                            
+                            <button class="btn btn-primary mt-3" form="trackform" type="submit">Track</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
