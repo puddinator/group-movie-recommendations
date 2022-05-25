@@ -1,45 +1,86 @@
-/* Size for brand */
-nav .navbar-brand
-{
-    font-size: xx-large;
+a:link { text-decoration: none; }
+a:visited { text-decoration: none; }
+a:hover { text-decoration: none; }
+a:active { text-decoration: none; }
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    font-family: 'Roboto', Times, serif;
 }
 
-/* Colors for brand */
-nav .navbar-brand .blue
-{
-    color: #537fbe;
-}
-nav .navbar-brand .red
-{
-    color: #ea433b;
-}
-nav .navbar-brand .yellow
-{
-    color: #f5b82e;
-}
-nav .navbar-brand .green
-{
-    color: #2e944b;
+header {
+    background-color: #f1faee;
+    display: flex;
+    width: 100vw;
 }
 
-
-table {
-    margin-left: auto;
-    margin-right: auto;
+.my-github {
+    margin: 0.7rem 2rem 0.7rem auto;
+    display: flex;
+    align-items: center;
+    background-color: #1d3557;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 0.5rem 0.5rem;
+    gap: 0.5rem;
+    color: white;
+    font-size: 1rem;
 }
 
-.img-container {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 ratio */
-    height: 0;
-    overflow: hidden;
-  }
-  
-.img-container img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+.my-github-image {
+    width: 1.5rem;
+    height: auto;
 }
 
+.introduction {
+    width: 80vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem 0;
+    gap: 0.2rem;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0 2rem; 
+    margin: 0; 
+}
+
+.introduction-list li:not(:last-child) { 
+    margin-bottom: 0.7rem;  
+}
+
+#number-of-accounts {
+    width: 2rem;
+}
+
+form {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.username-input-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.username-input {
+    width: 15rem;
+    height: 2rem;
+}
+
+.submit-button {
+    background: #a8dadc;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 0.5rem 0.5rem;
+    font-size: 1rem;
+}
