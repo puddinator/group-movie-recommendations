@@ -46,15 +46,17 @@ def convert_rating(rating):
 url = get_url('abrokepcbuilder')
 
 # Default max number of pages
+page = 1
 last_page = 1000
 
-for page in range(1, last_page):
+while page <= last_page:
     response = get(url.format(page))
     html_soup = BeautifulSoup(response.text, 'html.parser')
     if last_page == 1000:
-        last_page = html_soup.find('div', class_ = 'paginate-pages').ul.find_all("li")[-1].text
+        last_page = int(html_soup.find('div', class_ = 'paginate-pages').ul.find_all("li")[-1].text)
     movie_containers = html_soup.find_all('li', class_='poster-container')
     for movie_container in movie_containers:
         extract_single_record(movie_container)
+    page += 1
 
 print(reviewed_movies)
