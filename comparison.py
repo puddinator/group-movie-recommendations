@@ -13,11 +13,14 @@ df1 = pd.read_csv('data/ratings.csv', index_col=False)
 df2 = pd.read_csv('data/my_ratings.csv', index_col=False)
 
 df = df1.merge(df2, left_on="movie_id", right_on="movie_id", how='left', suffixes=('_letterboxd', '_user'))
+df.dropna(inplace = True)
+df = df.groupby("user_id").filter(lambda x: len(x) > 30 )
 df['difference'] = abs(df['rating_letterboxd'] - df['rating_user'])
-# mean = df.loc[(df['user_id'] == 'turnitip') & (~(np.isnan(df["difference"])))].mean()
-mean = df.loc[~(np.isnan(df["difference"]))].groupby("user_id")["difference"].mean()
-mean_sorted = mean.sort_values
-print(mean_sorted)
-print(df)
 
-df.to_csv('data/test_ratings.csv', index=False)
+
+mean = df.groupby("user_id")["difference"].mean()
+mean_sorted = mean.sort_values(ascending=True)
+# Not sure if a bug, but might need .reset_index()
+print(mean_sorted)
+
+mean_sorted.to_csv('data/test_ratings.csv')
