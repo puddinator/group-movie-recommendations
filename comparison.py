@@ -1,26 +1,43 @@
-# df = pd.read_csv('data/raw_ratings.csv', index_col=False)
-
-# df = df.drop(columns=['_id'])
-# df = df[['user_id', 'movie_id', 'rating']]
-# df["rating"] = 10 * df["rating"]
-
-# df.to_csv('data/ratings.csv', index=False)
-
 import numpy as np
 import pandas as pd
+pd.options.mode.chained_assignment = None  # default='warn'
 
-df1 = pd.read_csv('data/ratings.csv', index_col=False)
-df2 = pd.read_csv('data/my_ratings.csv', index_col=False)
+MINIMUM_MATCHES = 80
 
-df = df1.merge(df2, left_on="movie_id", right_on="movie_id", how='left', suffixes=('_letterboxd', '_user'))
-df.dropna(inplace = True)
-df = df.groupby("user_id").filter(lambda x: len(x) > 30 )
-df['difference'] = abs(df['rating_letterboxd'] - df['rating_user'])
+# Open csv files into Dataframe, nrows=1000000 to trial and error
+df_ratings = pd.read_csv('data/ratings.csv', index_col=False)
+df_my_ratings = pd.read_csv('data/my_ratings.csv', index_col=False)
 
+# Merge on where movie_id are same
+df_merged = df_ratings.merge(df_my_ratings, left_on="movie_id", right_on="movie_id", how='left', suffixes=('_letterboxd', '_user'))
 
-mean = df.groupby("user_id")["difference"].mean()
-mean_sorted = mean.sort_values(ascending=True)
-# Not sure if a bug, but might need .reset_index()
-print(mean_sorted)
+# Filter out data samples with insufficient movie matches
+df_merged = df_merged.groupby("user_id", sort=False).filter(lambda x: x['rating_user'].count() > MINIMUM_MATCHES)
 
-mean_sorted.to_csv('data/test_ratings.csv')
+# Drop nan in order to calculate mean
+df_merged_dropped = df_merged.dropna()
+# Calculate differences in ratings
+
+df_merged_dropped['difference'] = abs(df_merged_dropped['rating_letterboxd'] - df_merged_dropped['rating_user'])
+
+''' Consider using transform to optimize code?'''
+
+# Calculate mean difference
+df_compatibility = df_merged_dropped.groupby("user_id", as_index=False, sort=False)['difference'].mean()
+# Sorting is with .sort_values(ascending=True)
+
+# Calculate similarity
+df_compatibility['similarity'] = 100 - df_compatibility['difference']
+
+# Drops rated movies (not NaN) and groups it back
+df_weighted_movies = df_merged[df_merged['rating_user'].isnull()].merge(df_compatibility,  left_on="user_id", right_on="user_id")
+df_weighted_movies['weighted_rating'] = df_weighted_movies['rating_letterboxd'] * df_weighted_movies['similarity']
+
+df_suggestion_group = df_weighted_movies.groupby("movie_id")
+df_weighted_movies['score'] = df_suggestion_group.weighted_rating.transform(sum) / df_suggestion_group.similarity.transform(sum)
+
+score = df_weighted_movies.groupby('movie_id', as_index=False).filter(lambda x: x['score'].count() > MINIMUM_MATCHES)[['movie_id', 'score']].drop_duplicates().sort_values(by='score', ascending=False)
+# 
+print(score)
+
+score.to_csv('data/test_ratings.csv')
