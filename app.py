@@ -1,6 +1,6 @@
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, jsonify
 
-from helpers import get_url
+from scraper import scrape
 
 # Configure application
 app = Flask(__name__)
@@ -9,10 +9,13 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route("/loading", methods=["POST"])
-def loading():
-    return render_template("loading.html")
-
-@app.route("/results", methods=["POST"])
+@app.route("/results", methods=["GET"])
 def results():
-    return render_template("results.html")
+    number_of_accounts = request.args.get('number_of_accounts')
+    username_1 = request.args.get('username_1')
+    print(request.args)
+    result = scrape(username_1)
+    
+    return jsonify({
+            result
+        })
