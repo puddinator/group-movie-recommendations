@@ -13,9 +13,6 @@ def index():
 def results():
     number_of_accounts = request.args.get('number_of_accounts')
     username_1 = request.args.get('username_1')
-    print(request.args)
     result = scrape(username_1)
     
-    return jsonify({
-            result
-        })
+    return result

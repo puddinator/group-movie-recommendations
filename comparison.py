@@ -46,4 +46,4 @@ def merge_for_comparison(reviewed_movies):
 
     score.to_csv('data/test_ratings.csv')
 
-    return score
+    return score.head(50).to_json(orient='table',index=False)
