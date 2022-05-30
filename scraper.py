@@ -3,9 +3,6 @@ from bs4 import BeautifulSoup
 
 from comparison import merge_for_comparison
 
-# Data list to store the scraped data in
-reviewed_movies = []
-
 def get_url(username):
     url = 'https://www.letterboxd.com/{}/films/'.format(username)
 
@@ -19,7 +16,7 @@ def extract_single_record(movie_container):
         reviewed_movie = {} 
         reviewed_movie['movie_id'] = movie_container.div['data-target-link'][6:][:-1] 
         reviewed_movie['rating'] = convert_rating(movie_container.p.span.text)
-        reviewed_movies.append(reviewed_movie)
+        return reviewed_movie
 
 def convert_rating(rating):
     if rating == '½':
@@ -50,6 +47,8 @@ def scrape(username):
     page = 1
     last_page = 1000
 
+    reviewed_movies = []
+
     while page <= last_page:
         response = get(url.format(page))
         html_soup = BeautifulSoup(response.text, 'html.parser')
@@ -57,8 +56,22 @@ def scrape(username):
             last_page = int(html_soup.find('div', class_ = 'paginate-pages').ul.find_all("li")[-1].text)
         movie_containers = html_soup.find_all('li', class_='poster-container')
         for movie_container in movie_containers:
-            extract_single_record(movie_container)
+            reviewed_movie = extract_single_record(movie_container)
+            if reviewed_movie is not None:
+                reviewed_movies.append(reviewed_movie)
         page += 1
-
-    return merge_for_comparison(reviewed_movies)
     
+    return reviewed_movies
+    
+
+def scrape_many(usernames, number_of_accounts):
+    reviewed_movies_all = []
+
+    for i in range (1, number_of_accounts + 1):
+        reviewed_movies = scrape(usernames['username_' + str(i)])
+        reviewed_movies_all.append(reviewed_movies)
+    
+    # print(reviewed_movies_all)
+    return merge_for_comparison(reviewed_movies_all, number_of_accounts)
+
+# scrape('abrokepcbuilder')

@@ -1,6 +1,6 @@
 from flask import Flask, flash, redirect, render_template, request, jsonify
 
-from scraper import scrape
+from scraper import scrape_many
 
 # Configure application
 app = Flask(__name__)
@@ -11,8 +11,13 @@ def index():
 
 @app.route("/results", methods=["GET"])
 def results():
-    number_of_accounts = request.args.get('number_of_accounts')
-    username_1 = request.args.get('username_1')
-    result = scrape(username_1)
+    number_of_accounts = int(request.args.get('number_of_accounts'))
+    usernames = request.args.to_dict()
+    if(number_of_accounts > 5 or len(usernames) > 6):
+        return 0
     
-    return result
+    for key in list(usernames.keys()):
+        if usernames[key] == 'undefined':
+            usernames.pop(key)
+    
+    return scrape_many(usernames, number_of_accounts)

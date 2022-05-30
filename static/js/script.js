@@ -8,7 +8,7 @@ fillWithResults = document.querySelector('.fill-with-results');
 numberOfAccounts = 1;
 
 numberOfAccountsInput.addEventListener('change', function(event){
-    numberOfAccounts = event.target.value;
+    numberOfAccounts = parseInt(event.target.value);
     generateUsernameForm.innerHTML = "";
     for (let i = 1; i <= numberOfAccounts; i++){
         const form = document.createElement('input');
@@ -22,32 +22,70 @@ numberOfAccountsInput.addEventListener('change', function(event){
 
 usernameFormButton.addEventListener('click', async function(event){
     event.preventDefault();
+    const usernames = document.querySelectorAll(".username-input");
 
-    const username1 = document.getElementById("site_username_1").value;
-    const response = await fetch(`/results?number_of_accounts=${numberOfAccounts}&username_1=${username1}`, {
-        method: 'GET'
-    });
-    
+    const response = await fetch(`/results?number_of_accounts=${numberOfAccounts}&username_1=${usernames[0].value}&username_2=${usernames[1] && usernames[1].value}&username_3=${usernames[2] && usernames[2].value}&username_4=${usernames[3] && usernames[3].value}&username_5=${usernames[4] && usernames[4].value}`, {method: 'GET'});
     const data = await response.json();
     console.log(data);
-    addResults(data);
+    addResults(data, usernames);
 });
 
-function addResults(data) {
-    fillWithHeader.innerHTML = `<th style="width:10%" scope="col">#</th> <th style="width:70%" scope="col">Movie</th> <th style="width:20%" scope="col">Score</th>`;
+function addResults(data, usernames) {
+    // genres image_url movie_id movie_title year_released vote_average vote_count 
+    fillWithHeader.innerHTML = `<th scope="col">#</th> 
+                                <th scope="col">Poster</th> 
+                                <th scope="col">Movie</th> 
+                                <th scope="col">Year</th> 
+                                <th scope="col">Genre</th>
+                                <th scope="col">Letterboxd No of Votes</th> 
+                                <th scope="col">Letterboxd Score</th>`;
+    for (let i = 0; i < numberOfAccounts; i++){                           
+        fillWithHeader.innerHTML += `<th scope="col">${usernames[i].value}'s Score</th>`;
+    }
+    fillWithHeader.innerHTML += `<th scope="col">Average Score</th>`;
 
-    for (let i = 1; i <= 50; i++){
+    for (let i = 1; i <= 100; i++){
         const resultRow = document.createElement('tr');
+
         const resultRowNo = document.createElement('th');
         resultRowNo.setAttribute('scope', 'row');
         resultRowNo.innerText = i;
         resultRow.appendChild(resultRowNo);
+
+        const resultRowPoster = document.createElement('td');
+        resultRowPoster.innerHTML = `<img class="my-github-image" src="https://a.ltrbxd.com/resized/${data.data[i - 1].image_url}.jpg">`;
+        resultRow.appendChild(resultRowPoster);
+
         const resultRowMovie = document.createElement('td');
-        resultRowMovie.innerText = data.data[i - 1].movie_id;
+        resultRowMovie.innerText = data.data[i - 1].movie_title;
         resultRow.appendChild(resultRowMovie);
-        const resultRowScore = document.createElement('td');
-        resultRowScore.innerText = data.data[i - 1]['score'];
-        resultRow.appendChild(resultRowScore);
+
+        const resultRowYear = document.createElement('th');
+        resultRowYear.innerText = data.data[i - 1].year_released;
+        resultRow.appendChild(resultRowYear);
+
+        const resultRowGenre = document.createElement('td');
+        resultRowGenre.innerText = data.data[i - 1].genres;
+        resultRow.appendChild(resultRowGenre);
+
+        const resultRowVotes = document.createElement('td');
+        resultRowVotes.innerText = data.data[i - 1].vote_count;
+        resultRow.appendChild(resultRowVotes);
+
+        const resultRowAverageScore = document.createElement('td');
+        resultRowAverageScore.innerText = data.data[i - 1].vote_average;
+        resultRow.appendChild(resultRowAverageScore);
+
+        for (let j = 1; j <= numberOfAccounts; j++){                           
+            const resultRowUserScore = document.createElement('td');
+            resultRowUserScore.innerText = data.data[i - 1][`score_${j}`].toFixed(1);
+            resultRow.appendChild(resultRowUserScore);
+        }
+
+        const resultRowMeanScore = document.createElement('td');
+        resultRowMeanScore.innerText = data.data[i - 1]['mean_score'].toFixed(1);
+        resultRow.appendChild(resultRowMeanScore);
+
         fillWithResults.appendChild(resultRow);
     }
 }
