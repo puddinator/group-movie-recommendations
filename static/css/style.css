@@ -85,6 +85,14 @@ form {
     font-size: 1rem;
 }
 
+#progress-container {
+    margin-top: 2.5rem;
+}
+
+#progress-list li:not(:last-child) { 
+    margin-bottom: 0.3rem;  
+}
+
 .table {
     margin-top: 5rem;
     max-height: 60vh;

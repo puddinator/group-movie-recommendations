@@ -64,14 +64,16 @@ def scrape(username):
     return reviewed_movies
     
 
-def scrape_many(usernames, number_of_accounts):
+def scrape_many(self, usernames, number_of_accounts):
     reviewed_movies_all = []
-
-    for i in range (1, number_of_accounts + 1):
+    
+    for i in range (1, int(number_of_accounts) + 1):
+        self.update_state(state='PROGRESS', meta={'status': 'Gathering ' + usernames['username_' + str(i)] + "'s user data"})
         reviewed_movies = scrape(usernames['username_' + str(i)])
         reviewed_movies_all.append(reviewed_movies)
-    
+        self.update_state(state='PROGRESS', meta={'status': "Gathered!"})
+
     # print(reviewed_movies_all)
-    return merge_for_comparison(reviewed_movies_all, number_of_accounts)
+    return merge_for_comparison(self, reviewed_movies_all, number_of_accounts, usernames)
 
 # scrape('abrokepcbuilder')

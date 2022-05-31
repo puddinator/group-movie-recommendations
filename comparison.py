@@ -5,15 +5,17 @@ pd.options.mode.chained_assignment = None  # default='warn'
 MINIMUM_MATCHES = 80
 
 
-def merge_for_comparison(reviewed_movies_all, number_of_accounts):
+def merge_for_comparison(self, reviewed_movies_all, number_of_accounts, usernames):
     # Open csv files into Dataframe, nrows=1000000 to troubleshot
-    df_ratings = pd.read_csv('data/ratings.csv', index_col=False)
+    df_ratings = pd.read_csv('data/ratings.csv', index_col=False, nrows=1000000)
     
     counter = 1
     first_time = True
     df_score_merged = pd.DataFrame()
 
     for reviewed_movies in reviewed_movies_all:
+        self.update_state(state='PROGRESS', meta={'status': 'Calculating ' + usernames['username_' + str(counter)] + "'s movie scores"})
+
         df_my_ratings = pd.DataFrame(reviewed_movies)
 
         # Merge on where movie_id are same
@@ -48,6 +50,9 @@ def merge_for_comparison(reviewed_movies_all, number_of_accounts):
         df_weighted_movies['score_' + str(counter)] = df_suggestion_group.weighted_rating.transform(sum) / df_suggestion_group.similarity.transform(sum)
 
         df_score = df_weighted_movies.groupby('movie_id', as_index=False).filter(lambda x: x['score_' + str(counter)].count() > MINIMUM_MATCHES)[['movie_id', 'score_' + str(counter)]].drop_duplicates()
+        
+        self.update_state(state='PROGRESS', meta={'status': "Calculated!"})
+
         counter += 1
 
         if first_time == True:
@@ -55,6 +60,8 @@ def merge_for_comparison(reviewed_movies_all, number_of_accounts):
             first_time = False
         else:
             df_score_merged = df_score_merged.merge(df_score, left_on="movie_id", right_on="movie_id")
+
+    self.update_state(state='PROGRESS', meta={'status': 'Calculating combined movie scores'})
 
     # Calculate mean score and sort
     df_score_merged['mean_score'] = df_score_merged.iloc[:, 1:1 + number_of_accounts].mean(axis=1)
@@ -65,5 +72,5 @@ def merge_for_comparison(reviewed_movies_all, number_of_accounts):
     # genres image_url movie_id movie_title year_released vote_average vote_count ||  _id tbc
     df_movie_info_merge = df_movie_info.merge(df_score_merged.head(100), left_on="movie_id", right_on="movie_id").sort_values(by='mean_score', ascending=False)
     # df_movie_info_merge.to_csv('data/test_ratings.csv', index=False)
-
+    # print(df_movie_info_merge)
     return df_movie_info_merge.to_json(orient='table', index=False)
