@@ -5,9 +5,9 @@ from scraper import scrape_many
 
 # Configure application
 app = Flask(__name__)
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+app.config['CELERY_broker_url'] = 'redis://localhost:6379/0'
+app.config['result_backend'] = 'redis://localhost:6379/0'
+celery = Celery(app.name, broker=app.config['CELERY_broker_url'])
 celery.conf.update(app.config)
 
 @app.route("/", methods=["GET"])
@@ -31,9 +31,7 @@ def results():
 
 @celery.task(bind=True)
 def long_task(self, usernames):
-    print(usernames)
     number_of_accounts = len(usernames)
-    print(number_of_accounts)
     results = scrape_many(self, usernames, number_of_accounts)
     return {'state': 'DONE', 'status': 'Task completed!', 'result': results}
 
@@ -44,7 +42,7 @@ def taskstatus(task_id):
         # Task not started
         response = {
             'state': task_result.state,
-            'status': 'Task not started...'
+            'status': 'Celery task not started...'
         }
     elif task_result.state != 'FAILURE':
         response = {

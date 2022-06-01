@@ -79,7 +79,7 @@ function update_progress(status_url, progressList, usernames) {
             // Run again after 5 seconds
             setTimeout(function() {
                 update_progress(status_url, progressList, usernames);
-            }, 5000);
+            }, 1);
         }
     });
 }
