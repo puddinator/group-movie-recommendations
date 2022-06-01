@@ -1,3 +1,4 @@
+import time
 from flask import Flask, flash, redirect, render_template, request, jsonify, url_for
 from celery import Celery
 
@@ -14,17 +15,16 @@ celery.conf.update(app.config)
 def index():
     return render_template("index.html")
 
-@app.route("/results", methods=["GET"])
+@app.route("/results", methods=["POST"])
 def results():
-    number_of_accounts = int(request.args.get('number_of_accounts'))
-    usernames = request.args.to_dict()
-    if(number_of_accounts > 5 or len(usernames) > 6):
-        return jsonify({}), 404
+    usernames = request.form.to_dict()
+    # Mutates usernames too
+    number_of_accounts = int(usernames.pop("number-of-accounts"))
     
-    for key in list(usernames.keys()):
-        if usernames[key] == 'undefined' or key == 'number_of_accounts':
-            usernames.pop(key)
-
+    if(number_of_accounts > 5 or len(usernames) > 5):
+        return jsonify({}), 404
+    print(number_of_accounts)
+    print(usernames)
     task = long_task.delay(usernames)
 
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}

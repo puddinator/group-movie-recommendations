@@ -15,7 +15,7 @@ numberOfAccountsInput.addEventListener('change', function(event){
         const form = document.createElement('input');
         form.setAttribute('type', 'text');
         form.setAttribute('class', 'username-input');
-        form.setAttribute('id', `site_username_${i}`);
+        form.setAttribute('name', `username_${i}`);
         form.setAttribute('placeholder', 'Letterboxd Username');
         generateUsernameForm.appendChild(form);
     }
@@ -24,22 +24,23 @@ numberOfAccountsInput.addEventListener('change', function(event){
 usernameFormButton.addEventListener('click', async function(event){
     event.preventDefault();
 
-    start_long_task();
-    // const response = await fetch(`/results?number_of_accounts=${numberOfAccounts}&username_1=${usernames[0].value}&username_2=${usernames[1] && usernames[1].value}&username_3=${usernames[2] && usernames[2].value}&username_4=${usernames[3] && usernames[3].value}&username_5=${usernames[4] && usernames[4].value}`, {method: 'GET'});
-    // const data = await response.json();
-    // console.log(response);
-    // addResults(data, usernames);
+    let usernameForm = document.getElementById("username-form");
+    let fd = new FormData(usernameForm);
+    start_long_task(fd);
 });
 
-function start_long_task() {
+function start_long_task(fd) {
     const usernames = document.querySelectorAll(".username-input");
 
     progressList = $('<ul id="progress-list"></ul>');
     $('#progress-container').append(progressList);    
 
     $.ajax({
-        type: 'GET',
-        url: `/results?number_of_accounts=${numberOfAccounts}&username_1=${usernames[0].value}&username_2=${usernames[1] && usernames[1].value}&username_3=${usernames[2] && usernames[2].value}&username_4=${usernames[3] && usernames[3].value}&username_5=${usernames[4] && usernames[4].value}`,
+        type: 'POST',
+        url: `/results`,
+        data: fd,
+        processData: false,
+        contentType: false,
         success: function(data, status, request) {
             status_url = request.getResponseHeader('Location');
             update_progress(status_url, progressList[0], usernames);
@@ -79,7 +80,7 @@ function update_progress(status_url, progressList, usernames) {
             // Run again after 5 seconds
             setTimeout(function() {
                 update_progress(status_url, progressList, usernames);
-            }, 1);
+            }, 5000);
         }
     });
 }

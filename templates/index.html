@@ -30,7 +30,7 @@
     </div>
     <div class="form-container">
         <h3> We have &nbsp;
-            <select id="number-of-accounts" name="number-of-accounts">
+            <select id="number-of-accounts" name="number-of-accounts" form="username-form">
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -39,9 +39,9 @@
               </select>
               &nbsp; letterboxd account(s)! 
         </h3>
-        <form id="username-form">
+        <form id="username-form" method="POST">
             <div class="username-input-column">
-                <input type="text" class="username-input" id="site_username_1" placeholder="Letterboxd Username">
+                <input type="text" class="username-input" name="username_1" placeholder="Letterboxd Username">
             </div>
             <input type="submit" class="submit-button" id="submit-username-form" value="Submit">
         </form>
