@@ -5,7 +5,8 @@ usernameFormButton = document.getElementById('submit-username-form');
 fillWithHeader = document.querySelector('.fill-with-header');
 fillWithResults = document.querySelector('.fill-with-results');
 
-numberOfAccounts = 1;
+let numberOfAccounts = 1;
+let laststatus = '';
 
 numberOfAccountsInput.addEventListener('change', function(event){
     numberOfAccounts = parseInt(event.target.value);
@@ -32,8 +33,9 @@ usernameFormButton.addEventListener('click', async function(event){
 
 function start_long_task() {
     const usernames = document.querySelectorAll(".username-input");
+
     progressList = $('<ul id="progress-list"></ul>');
-    $('#progress-container').append(progressList);
+    $('#progress-container').append(progressList);    
 
     $.ajax({
         type: 'GET',
@@ -43,7 +45,7 @@ function start_long_task() {
             update_progress(status_url, progressList[0], usernames);
         },
         error: function() {
-            alert('Unexpected error. So early?!');
+            alert('Unexpected error. Try again later? :(');
         }
     });
 }
@@ -53,9 +55,13 @@ function update_progress(status_url, progressList, usernames) {
 
     $.getJSON(status_url, function(data) {
         // Update progressList with progressListItems, back to pure Javascript
-        const progressListItems = document.createElement('li');
-        progressListItems.innerText = data['status'];
-        progressList.appendChild(progressListItems);
+        if (laststatus != data['status']) {
+            const progressListItems = document.createElement('li');
+            progressListItems.innerText = data['status'];
+            progressList.appendChild(progressListItems);
+            laststatus = data['status']
+            progressListItems.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+        }
 
         // If it is 'FAILURE' or 'DONE'
         if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
@@ -73,7 +79,7 @@ function update_progress(status_url, progressList, usernames) {
             // Run again after 5 seconds
             setTimeout(function() {
                 update_progress(status_url, progressList, usernames);
-            }, 2000);
+            }, 5000);
         }
     });
 }
@@ -139,4 +145,5 @@ function addResults(data, usernames) {
 
         fillWithResults.appendChild(resultRow);
     }
+    fillWithHeader.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
 }

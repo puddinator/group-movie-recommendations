@@ -59,9 +59,10 @@ ul {
     width: 3rem;
 }
 
-form {
+#username-form {
     margin-top: 2rem;
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: 2rem;
 }
@@ -86,7 +87,13 @@ form {
 }
 
 #progress-container {
-    margin-top: 2.5rem;
+    margin-top: 3rem;
+}
+
+#progress-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #progress-list li:not(:last-child) { 
@@ -94,7 +101,7 @@ form {
 }
 
 .table {
-    margin-top: 5rem;
+    margin-top: 3rem;
     max-height: 60vh;
     max-width: 80vw;
 }
