@@ -10,10 +10,11 @@ body {
     padding: 0;
     margin: 0;
     font-family: 'Roboto', Times, serif;
+    background-color: #fdfffd;
 }
 
 header {
-    background-color: #f1faee;
+    background-color: #f0faec;
     display: flex;
     width: 100vw;
 }
@@ -42,7 +43,11 @@ header {
     flex-direction: column;
     align-items: center;
     margin: 1rem 0;
-    gap: 0.2rem;
+    gap: 0.8rem;
+}
+
+h1 {
+    font-weight: 700;
 }
 
 ul {
@@ -52,7 +57,25 @@ ul {
 }
 
 .introduction-list li:not(:last-child) { 
-    margin-bottom: 0.7rem;  
+    margin-bottom: 0.35rem;  
+}
+
+.form-container {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+@media screen and (min-width: 650px) {
+    .form-container {
+        margin-top: 1rem;
+        border: 2.5px dashed #457b9d;
+        border-radius: 10px;
+        padding: 2rem 2rem;
+    }
+}
+
+h3 {
+    font-weight: 600;
 }
 
 #number-of-accounts {
@@ -94,10 +117,15 @@ ul {
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
 }
 
 #progress-list li:not(:last-child) { 
     margin-bottom: 0.3rem;  
+}
+
+#loading {
+    margin-top: 2rem
 }
 
 .table {
