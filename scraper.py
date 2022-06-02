@@ -1,3 +1,4 @@
+import time 
 from requests import get
 from bs4 import BeautifulSoup
 
@@ -53,7 +54,11 @@ def scrape(username):
         response = get(url.format(page))
         html_soup = BeautifulSoup(response.text, 'html.parser')
         if last_page == 1000:
-            last_page = int(html_soup.find('div', class_ = 'paginate-pages').ul.find_all("li")[-1].text)
+            try:
+                last_page = int(html_soup.find('div', class_ = 'paginate-pages').ul.find_all("li")[-1].text)
+            except:
+                return
+
         movie_containers = html_soup.find_all('li', class_='poster-container')
         for movie_container in movie_containers:
             reviewed_movie = extract_single_record(movie_container)
@@ -66,14 +71,24 @@ def scrape(username):
 
 def scrape_many(self, usernames, number_of_accounts):
     reviewed_movies_all = []
-    
-    for i in range (1, int(number_of_accounts) + 1):
-        self.update_state(state='PROGRESS', meta={'status': 'Gathering ' + usernames['username_' + str(i)] + "'s user data"})
-        reviewed_movies = scrape(usernames['username_' + str(i)])
-        reviewed_movies_all.append(reviewed_movies)
+    deleted = 0
+    for i in range (0, number_of_accounts):
+        self.update_state(state='PROGRESS', meta={'status': 'Gathering ' + usernames[i - deleted] + "'s user data"})
+        reviewed_movies = scrape(usernames[i - deleted])
+        if reviewed_movies == None:
+            # Kill the app!!
+            if number_of_accounts == 1:
+                return None
+            # Skip current username
+            self.update_state(state='PROGRESS', meta={'status': 'User data for ' + usernames[i - deleted] + " could not be found, did you spell it correctly? Skipping..."})
+            time.sleep(5)
+            usernames.pop(i - deleted)
+            number_of_accounts -= 1
+            deleted += 1
+        else:
+            reviewed_movies_all.append(reviewed_movies)
         
-
     # print(reviewed_movies_all)
-    return merge_for_comparison(self, reviewed_movies_all, number_of_accounts, usernames)
+    return merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts)
 
 # scrape('abrokepcbuilder')

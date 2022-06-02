@@ -1,3 +1,4 @@
+import time 
 from operator import index
 import numpy as np
 import pandas as pd
@@ -5,25 +6,23 @@ import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
 
 # To test speed
-import time 
 # start = time.process_time()
 # print(time.process_time() - start)
         
 MINIMUM_MATCHES = 100
 
 
-def merge_for_comparison(self, reviewed_movies_all, number_of_accounts, usernames):
+def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts):
     # Open csv files into Dataframe, nrows=1000000 to troubleshot
-    df_ratings = pd.read_csv('data/ratings.csv', index_col=False)
+    df_ratings = pd.read_csv('data/ratings.csv', index_col=False, nrows=1000000)
     df_movie_info = pd.read_csv('data/movie_data.csv', index_col=False)
-    start = time.process_time()
 
-    counter = 1
+    counter = 0
     first_time = True
     df_score_merged = pd.DataFrame()
 
     for reviewed_movies in reviewed_movies_all:
-        self.update_state(state='PROGRESS', meta={'status': 'Calculating ' + usernames['username_' + str(counter)] + "'s movie scores"})
+        self.update_state(state='PROGRESS', meta={'status': 'Calculating ' + usernames[counter] + "'s movie scores"})
         
         df_merged = (
             pd.DataFrame(reviewed_movies)
@@ -89,7 +88,6 @@ def merge_for_comparison(self, reviewed_movies_all, number_of_accounts, username
         # Merge with movie db
         .merge(df_movie_info, left_on="movie_id", right_on="movie_id")
     )
-    print(time.process_time() - start)
 
     # df_movie_info_merge.to_csv('data/test_ratings.csv', index=False)
     # print(df_movie_info_merge)

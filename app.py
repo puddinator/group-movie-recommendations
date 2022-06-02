@@ -20,11 +20,11 @@ def results():
     usernames = request.form.to_dict()
     # Mutates usernames too
     number_of_accounts = int(usernames.pop("number-of-accounts"))
+    usernames = list(usernames.values())
     
     if(number_of_accounts > 5 or len(usernames) > 5):
         return jsonify({}), 404
-    print(number_of_accounts)
-    print(usernames)
+
     task = long_task.delay(usernames)
 
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
@@ -33,6 +33,10 @@ def results():
 def long_task(self, usernames):
     number_of_accounts = len(usernames)
     results = scrape_many(self, usernames, number_of_accounts)
+    if results == None and number_of_accounts == 1:
+        return {'state': 'ERROR', 'status': 'Username could not be found, did you spell it correctly?'}
+    elif results == None:
+        return {'state': 'ERROR', 'status': 'None of the usernames could not be found, did you spell them correctly?'}
     return {'state': 'DONE', 'status': 'Task completed!', 'result': results}
 
 @app.route('/status/<task_id>')
@@ -42,7 +46,7 @@ def taskstatus(task_id):
         # Task not started
         response = {
             'state': task_result.state,
-            'status': 'Celery task not started...'
+            'status': 'Celery task not started yet...'
         }
     elif task_result.state != 'FAILURE':
         response = {
@@ -56,6 +60,6 @@ def taskstatus(task_id):
         # Something died...
         response = {
             'state': task_result.state,
-            'status': 'Something went wrong! Error:' + str(task_result.info),
+            'status': 'Something went wrong! Error: ' + str(task_result.info),
         }
     return jsonify(response)
