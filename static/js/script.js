@@ -13,8 +13,6 @@ let laststatus = '';
 disableIfNoInput();
 
 numberOfAccountsInput.addEventListener('change', function(event){
-    usernameFormButton.disabled = true;
-    disableIfNoInput();
     numberOfAccounts = parseInt(event.target.value);
     generateUsernameForm.innerHTML = "";
     for (let i = 1; i <= numberOfAccounts; i++){
@@ -27,6 +25,9 @@ numberOfAccountsInput.addEventListener('change', function(event){
         form.setAttribute('placeholder', 'Letterboxd Username');
         generateUsernameForm.appendChild(form);        
     }
+
+    usernameFormButton.disabled = true;
+    disableIfNoInput();
 });
 
 usernameFormButton.addEventListener('click', async function(event){
@@ -58,19 +59,19 @@ function start_long_task(fd) {
             alert('Unexpected error sending your information. Try again later? :(');
         }
     });
-    // Disables form
-    numberOfAccountsInput.disabled = true;
     usernameFormButton.disabled = true;
+    // Had to do this for cases where user submit with 'Enter'
+    usernameFormButton.classList.add('disabled');
+    numberOfAccountsInput.disabled = true;
 }
 
 function update_progress(status_url, progressList, usernames, deletedUsernames) {
     // Send GET request to status URL
-
     $.getJSON(status_url, function(data) {
         // Update progressList with progressListItems, back to pure Javascript
         if (laststatus != data['status']) {
             // Removes previous loading icon if not null
-            const oldLoading = document.getElementById('loading')
+            const oldLoading = document.getElementById('loading');
             if (oldLoading != null) {
                 oldLoading.parentNode.removeChild(oldLoading);
             }
@@ -92,19 +93,22 @@ function update_progress(status_url, progressList, usernames, deletedUsernames) 
             loading.setAttribute('id', 'loading');
             progressList.appendChild(loading);
             
-            laststatus = data['status']
+            laststatus = data['status'];
             progressListItems.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
         }
 
         // If it is 'FAILURE' or 'DONE'
         if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
-            const oldLoading = document.getElementById('loading')
+            const oldLoading = document.getElementById('loading');
             oldLoading.parentNode.removeChild(oldLoading);
-            
+            // > If not, the app has died, error has been printed
             if ('result' in data) {
-                // If not, the app has died, error has been printed
+                // Enables form
+                numberOfAccountsInput.disabled = false;
+                usernameFormButton.classList.remove('disabled');
+                usernameFormButton.disabled = false;
                 // Print result using function
-                andTheResult = JSON.parse(data['result'])
+                andTheResult = JSON.parse(data['result']);
                 usernamesArray = removeInvalidUsernames(andTheResult, usernames, deletedUsernames);
                 addResults(andTheResult, usernamesArray);
             }
@@ -113,7 +117,7 @@ function update_progress(status_url, progressList, usernames, deletedUsernames) 
             // Run again after 5 seconds
             setTimeout(function() {
                 update_progress(status_url, progressList, usernames, deletedUsernames);
-            }, 5000);
+            }, 1);
         }
     });
 }
@@ -123,7 +127,7 @@ function removeInvalidUsernames(data, usernames, deletedUsernames){
     let numberOfAccountsDeleted = 0;
     for (let i = 0; i < numberOfAccounts + numberOfAccountsDeleted; i++) {
         if (deletedUsernames.includes(`${usernamesArray[i- numberOfAccountsDeleted].value}`)) {
-            usernamesArray.splice(i - numberOfAccountsDeleted, 1)
+            usernamesArray.splice(i - numberOfAccountsDeleted, 1);
             numberOfAccounts--;
             numberOfAccountsDeleted++;
         }
@@ -132,73 +136,55 @@ function removeInvalidUsernames(data, usernames, deletedUsernames){
 }
 
 function addResults(data, usernames) {
-    // genres image_url movie_id movie_title year_released vote_average vote_count 
-    fillWithHeader.innerHTML = `<th scope="col">#</th> 
-                                <th scope="col">Poster</th> 
-                                <th scope="col">Movie</th> 
-                                <th scope="col">Year</th> 
-                                <th scope="col">Genre</th>
-                                <th scope="col">Letterboxd No of Votes</th> 
-                                <th scope="col">Letterboxd Score</th>`;
+    // Column 1: Poster, movie title and genres, column 2: year, column 3: Popularity, column 4: avg rating
+    fillWithHeader.innerHTML = `<th scope="col style="width: 70%;"></th> 
+                                <th scope="col style="width: 10%;">Letterboxd Rating</th>`;
     for (let i = 0; i < numberOfAccounts; i++){                           
-        fillWithHeader.innerHTML += `<th scope="col">${usernames[i].value}'s Score</th>`;
+        fillWithHeader.innerHTML += `<th scope="col style="width: 10%;">${usernames[i].value}'s Predicted Rating</th>`;
     }
-    fillWithHeader.innerHTML += `<th scope="col">Average Score</th>`;
+    if (numberOfAccounts != 1) {
+        fillWithHeader.innerHTML += `<th scope="col">Average</th>`;
+    }
 
-    for (let i = 1; i <= 100; i++){
+    for (let i = 0; i < 100; i++){
         const resultRow = document.createElement('tr');
-
-        const resultRowNo = document.createElement('th');
-        resultRowNo.setAttribute('scope', 'row');
-        resultRowNo.innerText = i;
-        resultRow.appendChild(resultRowNo);
-
-        const resultRowPoster = document.createElement('td');
-        resultRowPoster.innerHTML = `<img class="my-github-image" src="https://a.ltrbxd.com/resized/${data.data[i - 1].image_url}.jpg">`;
-        resultRow.appendChild(resultRowPoster);
-
-        const resultRowMovie = document.createElement('td');
-        resultRowMovie.innerText = data.data[i - 1].movie_title;
-        resultRow.appendChild(resultRowMovie);
-
-        const resultRowYear = document.createElement('th');
-        resultRowYear.innerText = data.data[i - 1].year_released;
-        resultRow.appendChild(resultRowYear);
-
-        const resultRowGenre = document.createElement('td');
-        resultRowGenre.innerText = data.data[i - 1].genres;
-        resultRow.appendChild(resultRowGenre);
-
-        const resultRowVotes = document.createElement('td');
-        resultRowVotes.innerText = data.data[i - 1].vote_count;
-        resultRow.appendChild(resultRowVotes);
-
-        const resultRowAverageScore = document.createElement('td');
-        resultRowAverageScore.innerText = data.data[i - 1].vote_average;
-        resultRow.appendChild(resultRowAverageScore);
-
-        for (let j = 0; j < numberOfAccounts; j++){                           
-            const resultRowUserScore = document.createElement('td');
-            resultRowUserScore.innerText = data.data[i - 1][`score_${j}`].toFixed(1);
-            resultRow.appendChild(resultRowUserScore);
+        resultRow.classList.add('color-and-space');
+        let resultRowString = '';
+        resultRowString += `<td><div class="image-title-genre">
+                                    <img class="movie-image" src="https://a.ltrbxd.com/resized/${data.data[i].image_url}.jpg"/>
+                                    <div class="title-genre">
+                                        <p class="title">${data.data[i].movie_title} (${data.data[i].year_released})</p>
+                                        <ul class='genre-items'>`;
+        if (data.data[i].genres != null) {
+            data.data[i].genres = data.data[i].genres.slice(1).slice(0, -1);
+            if (data.data[i].genres.includes(",")) {
+                genres = data.data[i].genres.split(',');
+                for (const genre of genres) {
+                    resultRowString += `     <li class="genre-item">${genre.slice(1).slice(0, -1)}</li>`;
+                }
+            } else {
+                resultRowString += `     <li class="genre-item">${data.data[i].genres.slice(1).slice(0, -1)}</li>`;
+            }
         }
-
-        const resultRowMeanScore = document.createElement('td');
-        resultRowMeanScore.innerText = data.data[i - 1]['mean_score'].toFixed(1);
-        resultRow.appendChild(resultRowMeanScore);
-
+        
+        resultRowString += `</ul></div></div></td>
+                            <td><span class="add-info">${(data.data[i].vote_average / 10).toFixed(2)}</span></td>`;
+        for (let j = 0; j < numberOfAccounts; j++){
+            resultRowString += `<td><span class="add-info">${(data.data[i][`score_${j}`] / 10).toFixed(2)}</span></td>`;
+        }
+        if (numberOfAccounts != 1) {
+            resultRowString += `<td><span class="add-info">${(data.data[i]['mean_score'] / 10).toFixed(2)}</span></td>`;
+        }
+        resultRow.innerHTML = resultRowString;
         fillWithResults.appendChild(resultRow);
     }
     fillWithHeader.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
-    // Enables form
-    numberOfAccountsInput.disabled = false;
-    usernameFormButton.disabled = false;
 }
 
 
 // Disables submit button if no input
 function disableIfNoInput() {
-    $("form input").keyup(function() {
+    $("form input").on("keyup change",function () {
         var empty = false;
         $("form input").each(function() {
             if ($(this).val() == '') {
@@ -211,4 +197,27 @@ function disableIfNoInput() {
             $('input[type="submit"]').removeAttr('disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
         }
     });
+}
+
+// Slider
+$(".popularity-js-range-slider").ionRangeSlider({
+    min: 0,
+    max: 100,
+    from: 10,
+    skin: "round",
+    hide_from_to: true,
+    onChange: filterByPopularity(data.from)
+});
+$(".year-js-range-slider").ionRangeSlider({
+    type: "double",
+    min: 1950,
+    max: 2022,
+    from: 1980,
+    to: 2022,
+    skin: "round",
+    onChange: filterByYear(data)
+});
+
+function filterByPopularity(popularity) {
+    // From a scale of 0 to 100
 }
