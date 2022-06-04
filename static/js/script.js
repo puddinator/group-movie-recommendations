@@ -2,11 +2,13 @@ numberOfAccountsInput = document.getElementById('number-of-accounts');
 generateUsernameForm = document.querySelector('.username-input-column');
 usernameFormButton = document.getElementById('submit-username-form');
 
+fillwithFilters = document.getElementById('filters');
 fillWithHeader = document.querySelector('.fill-with-header');
 fillWithResults = document.querySelector('.fill-with-results');
 
 const differentLoading = ["dot-elastic", "dot-pulse", "dot-flashing", "dot-collision", "dot-revolution", "dot-carousel", "dot-typing", 
                           "dot-windmill", "dot-bricks", "dot-floating", "dot-fire", "dot-spin", "dot-falling", "dot-stretching"];
+const yearNow = new Date().getFullYear();
 let numberOfAccounts = 1;
 let laststatus = '';
 
@@ -32,6 +34,13 @@ numberOfAccountsInput.addEventListener('change', function(event){
 
 usernameFormButton.addEventListener('click', async function(event){
     event.preventDefault();
+
+    // Clears Everything
+    document.getElementById('progress-container').innerHTML = '';
+    fillwithFilters.innerHTML = '';
+    fillwithFilters.classList.remove('filters');
+    fillWithHeader.innerHTML = '';
+    fillWithResults.innerHTML = '';
 
     let usernameForm = document.getElementById("username-form");
     let fd = new FormData(usernameForm);
@@ -110,6 +119,7 @@ function update_progress(status_url, progressList, usernames, deletedUsernames) 
                 // Print result using function
                 andTheResult = JSON.parse(data['result']);
                 usernamesArray = removeInvalidUsernames(andTheResult, usernames, deletedUsernames);
+                loadFilter();
                 addResults(andTheResult, usernamesArray);
             }
         }
@@ -122,7 +132,7 @@ function update_progress(status_url, progressList, usernames, deletedUsernames) 
     });
 }
 
-function removeInvalidUsernames(data, usernames, deletedUsernames){
+function removeInvalidUsernames(data, usernames, deletedUsernames) {
     usernamesArray = [].slice.call(usernames);
     let numberOfAccountsDeleted = 0;
     for (let i = 0; i < numberOfAccounts + numberOfAccountsDeleted; i++) {
@@ -135,12 +145,50 @@ function removeInvalidUsernames(data, usernames, deletedUsernames){
     return usernamesArray;
 }
 
+function loadFilter() {
+    fillwithFilters.classList.add('filters');
+    fillwithFilters.innerHTML = `<div class="filter-container">
+    <h5>Popularity</h5> <input type="text" class="popularity-js-range-slider" name="my_range" value="" />
+    <div class="slide-texts"> <p class="slide-text">Well-rated</p> <p class="slide-text">Obscure</p> </div> </div>
+    <div class="filter-container"> <h5>Year</h5> <input type="text" class="year-js-range-slider" name="my_range" value="" />
+    <div class="slide-texts"> <p class="slide-text">1920</p> <p class="slide-text">${yearNow}</p> </div>
+    </div>`
+    $(".popularity-js-range-slider").ionRangeSlider({
+        type: "double",
+        min: 0,
+        max: 1000,
+        from: 100,
+        to: 1000,
+        skin: "round",
+        hide_from_to: true,
+        onStart: function(data) {
+            filterByPopularity(data.from, data.to);
+        },
+        onChange: function(data) {
+            filterByPopularity(data.from, data.to);
+        },
+    });
+    $(".year-js-range-slider").ionRangeSlider({
+        type: "double",
+        min: 1920,
+        max: yearNow,
+        from: 1940,
+        to: yearNow,
+        skin: "round",
+        onStart: function(data) {
+            filterByYear(data.from, data.to)
+        },
+        onChange: function(data) {
+            filterByYear(data.from, data.to)
+        },
+    });
+}
+
 function addResults(data, usernames) {
-    // Column 1: Poster, movie title and genres, column 2: year, column 3: Popularity, column 4: avg rating
-    fillWithHeader.innerHTML = `<th scope="col style="width: 70%;"></th> 
-                                <th scope="col style="width: 10%;">Letterboxd Rating</th>`;
+    fillWithHeader.innerHTML = `<th scope="col"></th> 
+                                <th scope="col">Letterboxd Rating</th>`;
     for (let i = 0; i < numberOfAccounts; i++){                           
-        fillWithHeader.innerHTML += `<th scope="col style="width: 10%;">${usernames[i].value}'s Predicted Rating</th>`;
+        fillWithHeader.innerHTML += `<th scope="col">${usernames[i].value}'s<br> Predicted Rating</th>`;
     }
     if (numberOfAccounts != 1) {
         fillWithHeader.innerHTML += `<th scope="col">Average</th>`;
@@ -149,8 +197,9 @@ function addResults(data, usernames) {
     for (let i = 0; i < 100; i++){
         const resultRow = document.createElement('tr');
         resultRow.classList.add('color-and-space');
+        resultRow.setAttribute('data-number-watched', `${data.data[i].vote_count * 100}`)
         let resultRowString = '';
-        resultRowString += `<td><div class="image-title-genre">
+        resultRowString += `<td class="responsive-bar"><div class="image-title-genre">
                                     <img class="movie-image" src="https://a.ltrbxd.com/resized/${data.data[i].image_url}.jpg"/>
                                     <div class="title-genre">
                                         <p class="title">${data.data[i].movie_title} (${data.data[i].year_released})</p>
@@ -200,24 +249,29 @@ function disableIfNoInput() {
 }
 
 // Slider
-$(".popularity-js-range-slider").ionRangeSlider({
-    min: 0,
-    max: 100,
-    from: 10,
-    skin: "round",
-    hide_from_to: true,
-    onChange: filterByPopularity(data.from)
-});
-$(".year-js-range-slider").ionRangeSlider({
-    type: "double",
-    min: 1950,
-    max: 2022,
-    from: 1980,
-    to: 2022,
-    skin: "round",
-    onChange: filterByYear(data)
-});
+function filterByPopularity(startPopularity, endPopularity) {
+    // From a scale of 0 to 1000, 0 is most popular
+    tableRows = document.querySelectorAll('.color-and-space');
+    tableRows.forEach((tableRow) => {
+        numberWatched = tableRow.getAttribute("data-number-watched");
+        // Sort of split into 2 tiers. Tier 1: >1m, Tier 2: <1m
+        if (numberWatched > 1000000) numberWatchedPercentile = 100 - ((numberWatched - 1000000) / 1000000) * 100;
+        else numberWatchedPercentile = 1000 - (numberWatched / 1000000) * 900;
+        if (numberWatchedPercentile < startPopularity || numberWatchedPercentile > endPopularity) {
+            // tableRow.style.display = "none";
+            tableRow.classList.add('collapse')
+        }
+        else tableRow.classList.remove('collapse')
+    });
+}
 
-function filterByPopularity(popularity) {
-    // From a scale of 0 to 100
+function filterByYear(startYear, endYear) {
+    tableRows = document.querySelectorAll('.color-and-space');
+    tableRows.forEach((tableRow) => {
+        year = tableRow.childNodes[0].innerHTML.split('</p>')[0].substr(-5).slice(0, -1);
+        if (startYear > year || endYear < year) {
+            tableRow.classList.add('collapse')
+        }
+        else tableRow.classList.remove('collapse')
+    });
 }

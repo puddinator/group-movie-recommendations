@@ -140,7 +140,6 @@ h3 {
 .table {
     border-collapse: separate;
     border-spacing: 0 5px;
-    table-layout: fixed;
 }
 
 th {
@@ -148,6 +147,10 @@ th {
     font-weight: 500;
     text-align: center;
     word-wrap: break-word;
+}
+
+.collapse {
+    visibility: collapse;
 }
 
 .table tr.color-and-space {
@@ -177,13 +180,17 @@ td:last-child {
     background: #bde0fe; 
 }
 
+.responsive-bar {
+    display: flex;
+}
+
 .image-title-genre {
     display: flex;
     align-items: center;
 }
 
 .movie-image {
-    border: 1px solid grey;
+    border: 1px solid rgb(117, 170, 163);
     margin-right: 1.5rem;
     width: 50px;
     height: 75px;
@@ -203,6 +210,7 @@ td:last-child {
 .genre-items {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 7px;
 }
@@ -214,6 +222,7 @@ td:last-child {
     border-radius: 10px;
     padding: 0.2rem 0.5rem;
     vertical-align: middle;
+    text-align: center;
     display: flex;
     align-items: center;
 }
@@ -234,12 +243,17 @@ td:last-child {
 
 .filters {
     display: flex;
-    gap: 5rem;
+    gap: 3rem;
+    margin-top: 2rem;
+    background: #e6e6e6;
+    padding: 0.3rem 2rem 0.5rem 2rem;
+    border-radius: 10px;
 }
 
 @media screen and (max-width: 700px) {
     .filters {
         flex-direction: column;
+        gap: 2.5rem;
     }
 }
 
