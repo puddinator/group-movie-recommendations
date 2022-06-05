@@ -9,13 +9,15 @@ pd.options.mode.chained_assignment = None  # default='warn'
 # start = time.process_time()
 # print(time.process_time() - start)
         
-MINIMUM_MATCHES = 100
+MINIMUM_MATCHES = 80
 
 
-def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts):
+def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast):
     # Open csv files into Dataframe, nrows=1000000 to troubleshot
-    df_ratings = pd.read_csv('data/ratings.csv', index_col=False, nrows=1000000)
-    df_movie_info = pd.read_csv('data/movie_data.csv', index_col=False)
+    df_ratings = pd.read_parquet('data/ratings.parquet')
+    if (fast == True):
+        df_ratings = df_ratings[:int(len(df_ratings.index) / 2)]
+    df_movie_info = pd.read_csv('data/old_movie_data.csv', index_col=False)
 
     counter = 0
     first_time = True
@@ -48,7 +50,8 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
             # Calculate similarity
             .assign(similarity = lambda x: 100 - x['difference'])
             # This arbitrarily increases the impact of weighing
-            # .assign(similarity = lambda x: abs((x['similarity'] - 60)) * 2)
+            .assign(similarity = lambda x: abs(x['similarity'] - 50))
+            .assign(similarity = lambda x: x['similarity'] ** 2)
         )
         
         df_weighted_movies = (

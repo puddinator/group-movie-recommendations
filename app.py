@@ -20,19 +20,23 @@ def results():
     usernames = request.form.to_dict()
     # Mutates usernames too
     number_of_accounts = int(usernames.pop("number-of-accounts"))
+    # Check if fast
+    if "fast?" in usernames:
+        fast = True
+        usernames.pop("fast?")
+    else: fast = False
     usernames = list(usernames.values())
-    
-    if(number_of_accounts > 5 or len(usernames) > 5):
+    if (number_of_accounts > 5 or len(usernames) > 5):
         return jsonify({}), 404
 
-    task = long_task.delay(usernames)
+    task = long_task.delay(usernames, fast)
 
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
 
 @celery.task(bind=True)
-def long_task(self, usernames):
+def long_task(self, usernames, fast):
     number_of_accounts = len(usernames)
-    results = scrape_many(self, usernames, number_of_accounts)
+    results = scrape_many(self, usernames, number_of_accounts, fast)
     if results == None and number_of_accounts == 1:
         return {'state': 'ERROR', 'status': 'Username could not be found, did you spell it correctly?'}
     elif results == None:

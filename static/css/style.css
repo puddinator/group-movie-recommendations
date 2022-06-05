@@ -101,6 +101,17 @@ h3 {
     height: 2rem;
 }
 
+.fast-submit {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+}
+
+.checkbox-text {
+    padding-right: 5px;
+}
+
 .submit-button {
     background: #a8dadc;
     border: 1px solid white;

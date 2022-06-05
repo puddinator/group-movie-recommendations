@@ -1,7 +1,7 @@
 import time 
 from requests import get
 from bs4 import BeautifulSoup
-
+# Needs LXML
 from comparison import merge_for_comparison
 
 def get_url(username):
@@ -14,10 +14,12 @@ def get_url(username):
 
 def extract_single_record(movie_container):
     if movie_container.p.span is not None:
-        reviewed_movie = {} 
-        reviewed_movie['movie_id'] = movie_container.div['data-target-link'][6:][:-1] 
-        reviewed_movie['rating'] = convert_rating(movie_container.p.span.text)
-        return reviewed_movie
+        if (movie_container.p.span.text != ''):
+            # ^No rating but a heart
+            reviewed_movie = {} 
+            reviewed_movie['movie_id'] = movie_container.div['data-target-link'][6:][:-1] 
+            reviewed_movie['rating'] = convert_rating(movie_container.p.span.text)
+            return reviewed_movie
 
 def convert_rating(rating):
     if rating == '½':
@@ -52,7 +54,7 @@ def scrape(username):
 
     while page <= last_page:
         response = get(url.format(page))
-        html_soup = BeautifulSoup(response.text, 'html.parser')
+        html_soup = BeautifulSoup(response.text, 'lxml')
         if last_page == 1000:
             try:
                 last_page = int(html_soup.find('div', class_ = 'paginate-pages').ul.find_all("li")[-1].text)
@@ -69,7 +71,7 @@ def scrape(username):
     return reviewed_movies
     
 
-def scrape_many(self, usernames, number_of_accounts):
+def scrape_many(self, usernames, number_of_accounts, fast):
     reviewed_movies_all = []
     deleted = 0
     for i in range (0, number_of_accounts):
@@ -88,7 +90,7 @@ def scrape_many(self, usernames, number_of_accounts):
         else:
             reviewed_movies_all.append(reviewed_movies)
         
-    # print(reviewed_movies_all)
-    return merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts)
+    print(reviewed_movies_all)
+    return merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast)
 
 # scrape('abrokepcbuilder')

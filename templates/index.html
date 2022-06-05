@@ -44,7 +44,14 @@
             <div class="username-input-column">
                 <input type="text" class="username-input" id="username" name="username_1" autocomplete="on" placeholder="Letterboxd Username">
             </div>
-            <input type="submit" class="submit-button" id="submit-username-form" value="Submit" disabled>
+            <div class="fast-submit">
+                <div class="checkbox-text">
+                    <input type="checkbox" id="fast-checkbox" name="fast?" value="Fast!" form="username-form">
+                    <label for="Fast!">Fast!</label><br>
+                </div>
+                <input type="submit" class="submit-button" id="submit-username-form" value="Submit" disabled>
+            </div>
+
         </form>
     </div>
     <div id="progress-container">
@@ -58,7 +65,7 @@
             <h5>Popularity</h5>
             <input type="text" class="popularity-js-range-slider" name="my_range" value="" />
             <div class="slide-texts">
-                <p class="slide-text">Well-rated</p>
+                <p class="slide-text">Well-known</p>
                 <p class="slide-text">Obscure</p>
             </div>
         </div>
@@ -81,7 +88,7 @@
                 </tr>
             </thead>
             <tbody class="fill-with-results">
-                <!-- <tr class="color-and-space" data-number-watched="1900000">
+                <!-- <tr class="color-and-space" data-vote-count="1900000">
                     <td class="responsive-bar">
                         <div class="image-title-genre">
                             <img class="movie-image" src="https://www.gamespot.com/a/uploads/original/1562/15626911/3776884-image%285%29.png"/>

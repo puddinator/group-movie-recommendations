@@ -1,10 +1,7 @@
-cs50
 Flask
-Flask-Session
+celery
 requests
-datetime
 
 bs4
-selenium
-webdriver_manager
-
+numpy
+pandas

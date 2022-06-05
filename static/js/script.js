@@ -1,4 +1,5 @@
 numberOfAccountsInput = document.getElementById('number-of-accounts');
+fastCheckbox = document.getElementById('fast-checkbox');
 generateUsernameForm = document.querySelector('.username-input-column');
 usernameFormButton = document.getElementById('submit-username-form');
 
@@ -41,9 +42,12 @@ usernameFormButton.addEventListener('click', async function(event){
     fillwithFilters.classList.remove('filters');
     fillWithHeader.innerHTML = '';
     fillWithResults.innerHTML = '';
+    numberOfAccounts = parseInt(numberOfAccountsInput.value);
 
     let usernameForm = document.getElementById("username-form");
+    console.log(usernameForm);
     let fd = new FormData(usernameForm);
+    console.log(fd);
     start_long_task(fd);
 });
 
@@ -72,6 +76,7 @@ function start_long_task(fd) {
     // Had to do this for cases where user submit with 'Enter'
     usernameFormButton.classList.add('disabled');
     numberOfAccountsInput.disabled = true;
+    fastCheckbox.disabled = true;
 }
 
 function update_progress(status_url, progressList, usernames, deletedUsernames) {
@@ -116,6 +121,7 @@ function update_progress(status_url, progressList, usernames, deletedUsernames) 
                 numberOfAccountsInput.disabled = false;
                 usernameFormButton.classList.remove('disabled');
                 usernameFormButton.disabled = false;
+                fastCheckbox.disabled = false;
                 // Print result using function
                 andTheResult = JSON.parse(data['result']);
                 usernamesArray = removeInvalidUsernames(andTheResult, usernames, deletedUsernames);
@@ -127,7 +133,7 @@ function update_progress(status_url, progressList, usernames, deletedUsernames) 
             // Run again after 5 seconds
             setTimeout(function() {
                 update_progress(status_url, progressList, usernames, deletedUsernames);
-            }, 1);
+            }, 5000);
         }
     });
 }
@@ -149,7 +155,7 @@ function loadFilter() {
     fillwithFilters.classList.add('filters');
     fillwithFilters.innerHTML = `<div class="filter-container">
     <h5>Popularity</h5> <input type="text" class="popularity-js-range-slider" name="my_range" value="" />
-    <div class="slide-texts"> <p class="slide-text">Well-rated</p> <p class="slide-text">Obscure</p> </div> </div>
+    <div class="slide-texts"> <p class="slide-text">Well-known</p> <p class="slide-text">Obscure</p> </div> </div>
     <div class="filter-container"> <h5>Year</h5> <input type="text" class="year-js-range-slider" name="my_range" value="" />
     <div class="slide-texts"> <p class="slide-text">1920</p> <p class="slide-text">${yearNow}</p> </div>
     </div>`
@@ -197,7 +203,7 @@ function addResults(data, usernames) {
     for (let i = 0; i < 100; i++){
         const resultRow = document.createElement('tr');
         resultRow.classList.add('color-and-space');
-        resultRow.setAttribute('data-number-watched', `${data.data[i].vote_count * 100}`)
+        resultRow.setAttribute('data-vote-count', `${data.data[i].vote_count * 100}`)
         let resultRowString = '';
         resultRowString += `<td class="responsive-bar"><div class="image-title-genre">
                                     <img class="movie-image" src="https://a.ltrbxd.com/resized/${data.data[i].image_url}.jpg"/>
@@ -227,7 +233,7 @@ function addResults(data, usernames) {
         resultRow.innerHTML = resultRowString;
         fillWithResults.appendChild(resultRow);
     }
-    fillWithHeader.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+    fillwithFilters.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
 }
 
 
@@ -241,9 +247,9 @@ function disableIfNoInput() {
             }
         });
         if (empty) {
-            $('input[type="submit"]').attr('disabled', 'disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
+            $('input[type="submit"]').attr('disabled', 'disabled');
         } else {
-            $('input[type="submit"]').removeAttr('disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
+            $('input[type="submit"]').removeAttr('disabled');
         }
     });
 }
@@ -253,7 +259,7 @@ function filterByPopularity(startPopularity, endPopularity) {
     // From a scale of 0 to 1000, 0 is most popular
     tableRows = document.querySelectorAll('.color-and-space');
     tableRows.forEach((tableRow) => {
-        numberWatched = tableRow.getAttribute("data-number-watched");
+        numberWatched = tableRow.getAttribute("data-vote-count");
         // Sort of split into 2 tiers. Tier 1: >1m, Tier 2: <1m
         if (numberWatched > 1000000) numberWatchedPercentile = 100 - ((numberWatched - 1000000) / 1000000) * 100;
         else numberWatchedPercentile = 1000 - (numberWatched / 1000000) * 900;
