@@ -45,9 +45,7 @@ usernameFormButton.addEventListener('click', async function(event){
     numberOfAccounts = parseInt(numberOfAccountsInput.value);
 
     let usernameForm = document.getElementById("username-form");
-    console.log(usernameForm);
     let fd = new FormData(usernameForm);
-    console.log(fd);
     start_long_task(fd);
 });
 
@@ -200,10 +198,10 @@ function addResults(data, usernames) {
         fillWithHeader.innerHTML += `<th scope="col">Average</th>`;
     }
 
-    for (let i = 0; i < 100; i++){
+    for (let i = 0; i < 1000; i++){
         const resultRow = document.createElement('tr');
         resultRow.classList.add('color-and-space');
-        resultRow.setAttribute('data-vote-count', `${data.data[i].vote_count * 100}`)
+        resultRow.setAttribute('data-vote-count', `${data.data[i].vote_count}`)
         let resultRowString = '';
         resultRowString += `<td class="responsive-bar"><div class="image-title-genre">
                                     <img class="movie-image" src="https://a.ltrbxd.com/resized/${data.data[i].image_url}.jpg"/>
@@ -211,14 +209,10 @@ function addResults(data, usernames) {
                                         <p class="title">${data.data[i].movie_title} (${data.data[i].year_released})</p>
                                         <ul class='genre-items'>`;
         if (data.data[i].genres != null) {
-            data.data[i].genres = data.data[i].genres.slice(1).slice(0, -1);
-            if (data.data[i].genres.includes(",")) {
-                genres = data.data[i].genres.split(',');
-                for (const genre of genres) {
-                    resultRowString += `     <li class="genre-item">${genre.slice(1).slice(0, -1)}</li>`;
-                }
-            } else {
-                resultRowString += `     <li class="genre-item">${data.data[i].genres.slice(1).slice(0, -1)}</li>`;
+            console.log(data.data[i].genres);
+            for (genre of data.data[i].genres){
+                console.log(genre);
+                resultRowString += `     <li class="genre-item">${genre[0].toUpperCase() + genre.slice(1)}</li>`;
             }
         }
         

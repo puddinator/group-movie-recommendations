@@ -67,3 +67,7 @@ def taskstatus(task_id):
             'status': 'Something went wrong! Error: ' + str(task_result.info),
         }
     return jsonify(response)
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')

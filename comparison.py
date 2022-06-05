@@ -17,7 +17,7 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
     df_ratings = pd.read_parquet('data/ratings.parquet')
     if (fast == True):
         df_ratings = df_ratings[:int(len(df_ratings.index) / 2)]
-    df_movie_info = pd.read_csv('data/old_movie_data.csv', index_col=False)
+    df_movie_info = pd.read_parquet('data/movies.parquet')
 
     counter = 0
     first_time = True
@@ -49,9 +49,8 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
             .groupby("user_id", as_index=False, sort=False)['difference'].mean()
             # Calculate similarity
             .assign(similarity = lambda x: 100 - x['difference'])
-            # This arbitrarily increases the impact of weighing
-            .assign(similarity = lambda x: abs(x['similarity'] - 50))
-            .assign(similarity = lambda x: x['similarity'] ** 2)
+            # Find reviewers who are very similar in taste
+            .assign(similarity = lambda x: ((abs(x['similarity'] - 85.0) + (x['similarity'] - 85.0)) / 2) ** 2)
         )
         
         df_weighted_movies = (
@@ -87,7 +86,7 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
         df_score_merged.assign(mean_score = lambda x: x.iloc[:, 1:1 + number_of_accounts].mean(axis=1))
         # Sort and extract top few
         .sort_values(by='mean_score', ascending=False)
-        .head(100)
+        .head(10000)
         # Merge with movie db
         .merge(df_movie_info, left_on="movie_id", right_on="movie_id")
     )
