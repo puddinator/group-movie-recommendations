@@ -153,16 +153,16 @@ function loadFilter() {
     fillwithFilters.classList.add('filters');
     fillwithFilters.innerHTML = `<div class="filter-container">
     <h5>Popularity</h5> <input type="text" class="popularity-js-range-slider" name="my_range" value="" />
-    <div class="slide-texts"> <p class="slide-text">Well-known</p> <p class="slide-text">Obscure</p> </div> </div>
+    <div class="slide-texts"> <p class="slide-text">Obscure</p> <p class="slide-text">Well-known</p> </div> </div>
     <div class="filter-container"> <h5>Year</h5> <input type="text" class="year-js-range-slider" name="my_range" value="" />
     <div class="slide-texts"> <p class="slide-text">1920</p> <p class="slide-text">${yearNow}</p> </div>
     </div>`
     $(".popularity-js-range-slider").ionRangeSlider({
         type: "double",
-        min: 0,
-        max: 1000,
-        from: 100,
-        to: 1000,
+        min: 20,
+        max: 115,
+        from: 50,
+        to: 115,
         skin: "round",
         hide_from_to: true,
         onStart: function(data) {
@@ -197,7 +197,8 @@ function addResults(data, usernames) {
     if (numberOfAccounts != 1) {
         fillWithHeader.innerHTML += `<th scope="col">Average</th>`;
     }
-
+    
+    // size = data.data.length;
     for (let i = 0; i < 1000; i++){
         const resultRow = document.createElement('tr');
         resultRow.classList.add('color-and-space');
@@ -208,13 +209,24 @@ function addResults(data, usernames) {
                                     <div class="title-genre">
                                         <p class="title">${data.data[i].movie_title} (${data.data[i].year_released})</p>
                                         <ul class='genre-items'>`;
+
         if (data.data[i].genres != null) {
-            console.log(data.data[i].genres);
-            for (genre of data.data[i].genres){
-                console.log(genre);
-                resultRowString += `     <li class="genre-item">${genre[0].toUpperCase() + genre.slice(1)}</li>`;
+            data.data[i].genres = data.data[i].genres.slice(1).slice(0, -1);
+            if (data.data[i].genres.includes(",")) {
+                genres = data.data[i].genres.split(',');
+                for (const genre of genres) {
+                    resultRowString += `     <li class="genre-item">${genre.slice(1).slice(0, -1)}</li>`;
+                }
+            } else {
+                resultRowString += `     <li class="genre-item">${data.data[i].genres.slice(1).slice(0, -1)}</li>`;
             }
         }
+
+        // if (data.data[i].genres != null) {
+        //     for (genre of data.data[i].genres){
+        //         resultRowString += `     <li class="genre-item">${genre[0].toUpperCase() + genre.slice(1)}</li>`;
+        //     }
+        // }
         
         resultRowString += `</ul></div></div></td>
                             <td><span class="add-info">${(data.data[i].vote_average / 10).toFixed(2)}</span></td>`;
@@ -250,14 +262,15 @@ function disableIfNoInput() {
 
 // Slider
 function filterByPopularity(startPopularity, endPopularity) {
-    // From a scale of 0 to 1000, 0 is most popular
+    // From a scale of 0 to 115, 115 is most popular
     tableRows = document.querySelectorAll('.color-and-space');
     tableRows.forEach((tableRow) => {
-        numberWatched = tableRow.getAttribute("data-vote-count");
-        // Sort of split into 2 tiers. Tier 1: >1m, Tier 2: <1m
-        if (numberWatched > 1000000) numberWatchedPercentile = 100 - ((numberWatched - 1000000) / 1000000) * 100;
-        else numberWatchedPercentile = 1000 - (numberWatched / 1000000) * 900;
-        if (numberWatchedPercentile < startPopularity || numberWatchedPercentile > endPopularity) {
+        numberRated = tableRow.getAttribute("data-vote-count");
+        numberRatedCubeRoot = Math.cbrt(numberRated);
+        // Sort of split into 2 tiers. Tier 1: >90, Tier 2: <90
+        if (numberRatedCubeRoot > 90) numberRatedMath = (115 - numberRatedCubeRoot) / 5 + 90;
+        else numberRatedMath = (numberRatedCubeRoot / 70) * 90;
+        if (numberRatedMath < startPopularity || numberRatedMath > endPopularity) {
             // tableRow.style.display = "none";
             tableRow.classList.add('collapse')
         }
