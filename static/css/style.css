@@ -166,12 +166,13 @@ th {
     word-wrap: break-word;
 }
 
-.collapse {
+.random-collapse,
+.year-collapse,
+.popularity-collapse {
     visibility: collapse;
 }
 
 .table tr.color-and-space {
-    background: #d2eaff;
     margin-bottom: 0.5rem;
 }
 
@@ -179,6 +180,7 @@ td {
     border-width: 0;
     padding: 10px;
     vertical-align: middle !important;
+    background: #d2eaff;
 }
 
 td:first-child {
@@ -306,6 +308,26 @@ hr {
     border-bottom: 1px solid #ffffff;
 }
 
+.fill-with-button{
+    width: 600px;
+    max-width: 95vw;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.random-movie-button-container {
+    margin-top: 1rem;
+    display: flex;
+}
+
+#random-movie-button {
+    background: #a8dadc;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 0.5rem 0.5rem;
+    font-size: 1rem;
+}
+
 .footer-container {
     width: 500px;
     max-width: 70vw;
@@ -313,4 +335,5 @@ hr {
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: justify;
 }

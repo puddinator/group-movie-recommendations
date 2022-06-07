@@ -6,6 +6,7 @@ usernameFormButton = document.getElementById('submit-username-form');
 fillwithFilters = document.getElementById('filters');
 fillWithHeader = document.querySelector('.fill-with-header');
 fillWithResults = document.querySelector('.fill-with-results');
+fillWithButton= document.querySelector('.fill-with-button');
 
 const differentLoading = ["dot-elastic", "dot-pulse", "dot-flashing", "dot-collision", "dot-revolution", "dot-carousel", "dot-typing", 
                           "dot-windmill", "dot-bricks", "dot-floating", "dot-fire", "dot-spin", "dot-falling", "dot-stretching"];
@@ -42,6 +43,7 @@ usernameFormButton.addEventListener('click', async function(event){
     fillwithFilters.classList.remove('filters');
     fillWithHeader.innerHTML = '';
     fillWithResults.innerHTML = '';
+    fillWithButton.innerHTML = '';
     numberOfAccounts = parseInt(numberOfAccountsInput.value);
 
     let usernameForm = document.getElementById("username-form");
@@ -123,8 +125,8 @@ function update_progress(status_url, progressList, usernames, deletedUsernames) 
                 // Print result using function
                 andTheResult = JSON.parse(data['result']);
                 usernamesArray = removeInvalidUsernames(andTheResult, usernames, deletedUsernames);
-                loadFilter();
                 addResults(andTheResult, usernamesArray);
+                loadFilter();
             }
         }
         else {
@@ -176,7 +178,7 @@ function loadFilter() {
         type: "double",
         min: 1920,
         max: yearNow,
-        from: 1940,
+        from: 1970,
         to: yearNow,
         skin: "round",
         onStart: function(data) {
@@ -239,7 +241,34 @@ function addResults(data, usernames) {
         resultRow.innerHTML = resultRowString;
         fillWithResults.appendChild(resultRow);
     }
+    fillWithButton.innerHTML = '<div class="random-movie-button-container"><button id="random-movie-button">Random Movie!</button></div>';
+    addButton();
     fillwithFilters.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+}
+
+function addButton(){
+    randomMovieButton = document.getElementById('random-movie-button');
+    randomMovieButton.addEventListener('click', () => {
+        if (randomMovieButton.textContent == 'Random Movie!') {
+            tableRows = document.querySelectorAll('.color-and-space');
+            tableRows = [].slice.call(tableRows);
+            validTableRows = tableRows.filter((tableRow) => !(tableRow.classList.contains('year-collapse') || (tableRow.classList.contains('popularity-collapse'))));
+            random = Math.floor(Math.random() * validTableRows.length);
+            validTableRows.forEach(function (validTableRow, i) {
+                validTableRow.classList.add('random-collapse');
+                if (i == random) {
+                    validTableRow.classList.remove('random-collapse');
+                }
+            });
+            randomMovieButton.textContent = '<- Back';
+        } else {
+            tableRows = document.querySelectorAll('.color-and-space');
+            tableRows.forEach((tableRow) => {
+                tableRow.classList.remove('random-collapse')
+            });
+            randomMovieButton.textContent = 'Random Movie!';
+        }
+    });
 }
 
 
@@ -272,19 +301,21 @@ function filterByPopularity(startPopularity, endPopularity) {
         else numberRatedMath = (numberRatedCubeRoot / 70) * 90;
         if (numberRatedMath < startPopularity || numberRatedMath > endPopularity) {
             // tableRow.style.display = "none";
-            tableRow.classList.add('collapse')
+            tableRow.classList.add('popularity-collapse');
         }
-        else tableRow.classList.remove('collapse')
+        else {
+            tableRow.classList.remove('popularity-collapse');
+        }
     });
 }
 
 function filterByYear(startYear, endYear) {
     tableRows = document.querySelectorAll('.color-and-space');
     tableRows.forEach((tableRow) => {
-        year = tableRow.childNodes[0].innerHTML.split('</p>')[0].substr(-5).slice(0, -1);
+        year = tableRow.childNodes[0].innerHTML.split('</p>')[0].substr(-9).slice(0, -5);
         if (startYear > year || endYear < year) {
-            tableRow.classList.add('collapse')
+            tableRow.classList.add('year-collapse');
         }
-        else tableRow.classList.remove('collapse')
+        else tableRow.classList.remove('year-collapse');
     });
 }
