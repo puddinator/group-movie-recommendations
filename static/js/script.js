@@ -207,7 +207,7 @@ function addResults(data, usernames) {
         resultRowString += `<td class="responsive-bar"><div class="image-title-genre">
                                     <img class="movie-image" src="https://a.ltrbxd.com/resized/${data.data[i].image_url}.jpg"/>
                                     <div class="title-genre">
-                                        <p class="title">${data.data[i].movie_title} (${data.data[i].year_released})</p>
+                                        <p class="title"><a href="https://letterboxd.com/film/${data.data[i].movie_id}" target="_blank">${data.data[i].movie_title} (${data.data[i].year_released})</a></p>
                                         <ul class='genre-items'>`;
 
         if (data.data[i].genres != null) {
