@@ -117,17 +117,17 @@ function update_progress(status_url, progressList, usernames, deletedUsernames) 
             oldLoading.parentNode.removeChild(oldLoading);
             // > If not, the app has died, error has been printed
             if ('result' in data) {
-                // Enables form
-                numberOfAccountsInput.disabled = false;
-                usernameFormButton.classList.remove('disabled');
-                usernameFormButton.disabled = false;
-                fastCheckbox.disabled = false;
                 // Print result using function
                 andTheResult = JSON.parse(data['result']);
                 usernamesArray = removeInvalidUsernames(andTheResult, usernames, deletedUsernames);
                 addResults(andTheResult, usernamesArray);
                 loadFilter();
             }
+            // Enables form
+            numberOfAccountsInput.disabled = false;
+            usernameFormButton.classList.remove('disabled');
+            usernameFormButton.disabled = false;
+            fastCheckbox.disabled = false;
         }
         else {
             // Run again after 5 seconds
