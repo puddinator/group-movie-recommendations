@@ -5,3 +5,5 @@ requests
 bs4
 numpy
 pandas
+lxml
+pyarrow
