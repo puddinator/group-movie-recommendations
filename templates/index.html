@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Group Movie Recommendations</title>
+    <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     
@@ -65,8 +66,8 @@
             <h5>Popularity</h5>
             <input type="text" class="popularity-js-range-slider" name="my_range" value="" />
             <div class="slide-texts">
-                <p class="slide-text">Well-known</p>
                 <p class="slide-text">Obscure</p>
+                <p class="slide-text">Well-known</p>
             </div>
         </div>
         <div class="filter-container">
@@ -109,7 +110,40 @@
     </div>
     <div class="footer-container">
         <hr>
-        <p>Huge inspiration drawn from Sam Learner</p>
+        <div class="project-info">
+            <h4>About this project</h4>
+            <p>I came across Sam Learner's 
+                <a href="https://letterboxd.samlearner.com/" target="_blank">Letterboxd Movie Recommender</a>
+                a while back. It was awesome! I wanted to build something similar but for groups.
+            </p>
+            <p>
+                The model finds other Letterboxd reviewers who have similar movie tastes
+                to the group members and extrapolates based on their ratings to predict other movies
+                everyone would like. 
+                I found out halfway through that my model had a very similar idea to 
+                that of <a href="https://www.criticker.com/explain/" target="_blank">Criticker's Taste Compability Index</a>
+                though I decided not to use a percentile system as it wouldn't account for the 
+                inherent quality of the movies watched. Check out Criticker if you are still looking other
+                recommendations, it's really cool!
+            </p>
+            <p>
+                Built with: Flask, BeautifulSoup (scraper), Pandas (data analysis), Celery and Redis (delivering progress updates)
+                <br>Deployed with Gunicorn and Nginx
+            </p>
+        </div>
+        <div class="my-info">
+            <h4>About me</h4>
+            <p>Hi! I'm James and I <a href="https://letterboxd.com/abrokepcbuilder/" target="_blank">love to watch movies</a>.
+                I'm currently on a gap year and will matriculate
+                in 2023. If you have any suggestions or find any errors within the site, do let me know on
+                <a href="https://www.reddit.com/user/abrokepcbuilder" target="_blank">Reddit</a>!
+            </p>
+            <p>
+                I'm also looking for an internship opportunity (remote, unpaid). If you know of any relevant
+                Software Engineering / Web Dev / Data Science internship positions, do reach out
+                <a href="mailto:jamesgwz.work@gmail.com" target="_blank">reach out</a>!
+            </p>
+        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="../static/js/rangeSlider.js"></script>
