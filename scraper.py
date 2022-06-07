@@ -48,20 +48,22 @@ def scrape(username):
 
     # Default max number of pages
     page = 1
-    last_page = 1000
+    last_page = 1
 
     reviewed_movies = []
 
     while page <= last_page:
         response = get(url.format(page))
         html_soup = BeautifulSoup(response.text, 'lxml')
-        if last_page == 1000:
+        if last_page == 1:
             try:
                 last_page = int(html_soup.find('div', class_ = 'paginate-pages').ul.find_all("li")[-1].text)
             except:
-                return
+                pass
 
         movie_containers = html_soup.find_all('li', class_='poster-container')
+        if movie_containers == []:
+            return
         for movie_container in movie_containers:
             reviewed_movie = extract_single_record(movie_container)
             if reviewed_movie is not None:
@@ -90,7 +92,7 @@ def scrape_many(self, usernames, number_of_accounts, fast):
         else:
             reviewed_movies_all.append(reviewed_movies)
         
-    print(reviewed_movies_all)
+    # print(reviewed_movies_all)
     return merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast)
 
 # scrape('abrokepcbuilder')
