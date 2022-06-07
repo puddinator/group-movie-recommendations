@@ -9,11 +9,9 @@ pd.options.mode.chained_assignment = None  # default='warn'
 # start = time.process_time()
 # print(time.process_time() - start)
         
-MINIMUM_MATCHES = 80
-
 
 def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast):
-    # Open csv files into Dataframe, nrows=1000000 to troubleshot
+
     df_ratings = pd.read_parquet('data/ratings.parquet')
     if (fast == True):
         df_ratings = df_ratings[:int(len(df_ratings.index) / 2)]
@@ -25,6 +23,10 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
 
     for reviewed_movies in reviewed_movies_all:
         self.update_state(state='PROGRESS', meta={'status': 'Calculating ' + usernames[counter] + "'s movie scores"})
+
+        MINIMUM_MATCHES = len(reviewed_movies) / 2
+        MINIMUM_MATCHES_2 = 50 + len(reviewed_movies) / 10
+        if (MINIMUM_MATCHES_2 > 80): MINIMUM_MATCHES_2 = 80
         
         df_merged = (
             pd.DataFrame(reviewed_movies)
@@ -38,7 +40,8 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
             )
         )
         # Filter out other reviewers with insufficient movie matches
-        df_merged = df_merged[df_merged.groupby('user_id')['rating_user'].transform('size') >= MINIMUM_MATCHES]
+        # During the count it creates a copy, causing count number to double (?)
+        df_merged = df_merged[df_merged.groupby('user_id')['rating_user'].transform('count') >= MINIMUM_MATCHES * 2]
 
         df_compatibility = (
             # Drop nan in order to calculate mean
@@ -68,7 +71,7 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
         
         df_score = (
             # Filter out those with insufficient number of ratings
-            df_weighted_movies[df_weighted_movies.groupby('movie_id')['movie_id'].transform('size') >= MINIMUM_MATCHES]
+            df_weighted_movies[df_weighted_movies.groupby('movie_id')['movie_id'].transform('size') >= MINIMUM_MATCHES_2]
             # Drop the excess and get just movie_id and score_x
             .drop_duplicates(subset=['movie_id'])[['movie_id', 'score_' + str(counter)]]
         )
