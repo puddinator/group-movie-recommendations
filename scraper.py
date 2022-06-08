@@ -85,7 +85,7 @@ def scrape_many(self, usernames, number_of_accounts, fast):
                 return None
             # Skip current username
             self.update_state(state='PROGRESS', meta={'status': 'User data for ' + usernames[i - deleted] + " could not be found, did you spell it correctly? Skipping..."})
-            time.sleep(5)
+            time.sleep(10)
             usernames.pop(i - deleted)
             number_of_accounts -= 1
             deleted += 1
