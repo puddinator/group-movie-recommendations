@@ -3,7 +3,7 @@ fastCheckbox = document.getElementById('fast-checkbox');
 generateUsernameForm = document.querySelector('.username-input-column');
 usernameFormButton = document.getElementById('submit-username-form');
 
-fillwithFilters = document.getElementById('filters');
+fillWithFilters = document.getElementById('filters');
 fillWithHeader = document.querySelector('.fill-with-header');
 fillWithResults = document.querySelector('.fill-with-results');
 fillWithButton= document.querySelector('.fill-with-button');
@@ -39,8 +39,8 @@ usernameFormButton.addEventListener('click', async function(event){
 
     // Clears Everything
     document.getElementById('progress-container').innerHTML = '';
-    fillwithFilters.innerHTML = '';
-    fillwithFilters.classList.remove('filters');
+    fillWithFilters.innerHTML = '';
+    fillWithFilters.classList.remove('filters');
     fillWithHeader.innerHTML = '';
     fillWithResults.innerHTML = '';
     fillWithButton.innerHTML = '';
@@ -152,8 +152,8 @@ function removeInvalidUsernames(data, usernames, deletedUsernames) {
 }
 
 function loadFilter() {
-    fillwithFilters.classList.add('filters');
-    fillwithFilters.innerHTML = `<div class="filter-container">
+    fillWithFilters.classList.add('filters');
+    fillWithFilters.innerHTML = `<div class="filter-container">
     <h5>Popularity</h5> <input type="text" class="popularity-js-range-slider" name="my_range" value="" />
     <div class="slide-texts"> <p class="slide-text">Obscure</p> <p class="slide-text">Well-known</p> </div> </div>
     <div class="filter-container"> <h5>Year</h5> <input type="text" class="year-js-range-slider" name="my_range" value="" />
@@ -193,8 +193,12 @@ function loadFilter() {
 function addResults(data, usernames) {
     fillWithHeader.innerHTML = `<th scope="col"></th> 
                                 <th scope="col">Letterboxd Rating</th>`;
-    for (let i = 0; i < numberOfAccounts; i++){                           
-        fillWithHeader.innerHTML += `<th scope="col">${usernames[i].value}'s<br> Predicted Rating</th>`;
+    for (let i = 0; i < numberOfAccounts; i++) {
+        if (usernames[i].value.includes("imdb") == true) {
+            fillWithHeader.innerHTML += `<th scope="col">ur${usernames[i].value.split("ur")[1].split("/")[0]}'s<br> Predicted Rating</th>`;
+        } else {
+            fillWithHeader.innerHTML += `<th scope="col">${usernames[i].value}'s<br> Predicted Rating</th>`;
+        } 
     }
     if (numberOfAccounts != 1) {
         fillWithHeader.innerHTML += `<th scope="col">Average</th>`;
@@ -243,7 +247,7 @@ function addResults(data, usernames) {
     }
     fillWithButton.innerHTML = '<div class="random-movie-button-container"><button id="random-movie-button">Random Movie!</button></div>';
     addButton();
-    fillwithFilters.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+    fillWithFilters.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
 }
 
 function addButton(){

@@ -1,7 +1,7 @@
 import time
 from flask import Flask, flash, redirect, render_template, request, jsonify, url_for
 from celery import Celery
-
+# celery worker -l info -A my_app
 from scraper import scrape_many
 
 # Configure application

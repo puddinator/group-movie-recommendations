@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,12 +9,13 @@
     <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
-    
+
     <link rel="stylesheet" href="../static/css/style.css">
     <link rel="stylesheet" href="../static/css/loading.css">
-    <link rel="stylesheet" href="../static/css/rangeSlider.css"/>
-    
+    <link rel="stylesheet" href="../static/css/rangeSlider.css" />
+
 </head>
+
 <body>
     <header>
         <a class="my-github" href="https://github.com/puddinator/group-movie-recommendations" target="_blank">
@@ -23,12 +25,21 @@
     </header>
     <div class="introduction">
         <h1>Group Movie Recommendations</h1>
-        <ul class="introduction-list">
-            <li>1. Input the group's Letterboxd account names</li>
-            <li>2. Grab some popcorn while recommendations generate</li>
-            <li>3. Decide on which movie to watch or have one randomized</li>
-            <li>4. Enjoy!</li>
-        </ul>
+        <ol class="introduction-list">
+            <li>Input the group's Letterboxd account names or IMDb profile links
+                <br>
+                <span style="color: grey; display: flex;">
+                    (e.g. imdb.com/user/ur102028277/ — ratings must be&nbsp;
+                    <a href="https://help.imdb.com/article/imdb/track-movies-tv/how-do-i-change-the-privacy-setting-for-my-ratings/G59Z2UQUXC3WS6YL?ref_=helpart_nav_12#"
+                        target="_blank" style="text-decoration: underline;">
+                        public
+                    </a>)
+                </span>
+            </li>
+            <li>Grab some popcorn while recommendations generate</li>
+            <li>Decide on which movie to watch or have one randomized</li>
+            <li>Enjoy!</li>
+        </ol>
     </div>
     <div class="form-container">
         <h3> We have &nbsp;
@@ -38,12 +49,13 @@
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
-              </select>
-              &nbsp; letterboxd account(s)! 
+            </select>
+            &nbsp; letterboxd/IMDb account(s)!
         </h3>
         <form id="username-form" method="POST">
             <div class="username-input-column">
-                <input type="text" class="username-input" id="username" name="username_1" autocomplete="on" placeholder="Letterboxd Username">
+                <input type="text" class="username-input" id="username" name="username_1" autocomplete="on"
+                    placeholder="Letterboxd Username/IMDb Link">
             </div>
             <div class="fast-submit">
                 <div class="checkbox-text">
@@ -133,35 +145,38 @@
         <hr>
         <div class="project-info">
             <h4>About this project</h4>
-            <p>I came across Sam Learner's 
+            <p>I came across Sam Learner's
                 <a href="https://letterboxd.samlearner.com/" target="_blank">Letterboxd Movie Recommender</a>
                 a while back. It was awesome! I wanted to build something similar but for groups.
             </p>
             <p>
                 The model finds other Letterboxd reviewers who have similar movie tastes
                 to the group members and extrapolates based on their ratings to predict other movies
-                everyone would like. 
-                I found out halfway through that my model had a very similar idea to 
-                that of <a href="https://www.criticker.com/explain/" target="_blank">Criticker's Taste Compability Index</a>
-                though I decided not to use a percentile system as it wouldn't account for the 
+                everyone would like.
+                I found out halfway through that my model had a very similar idea to
+                that of <a href="https://www.criticker.com/explain/" target="_blank">Criticker's Taste Compability
+                    Index</a>
+                though I decided not to use a percentile system as it wouldn't account for the
                 inherent quality of the movies watched. Check out Criticker if you are still looking for other
                 recommendations, it's really cool!
             </p>
             <p>
-                Built with: Flask, BeautifulSoup (scraper), Pandas (data analysis), Celery and Redis (delivering progress updates)
+                Built with: Flask, BeautifulSoup (scraper), Pandas (data analysis), Celery and Redis (delivering
+                progress updates)
                 <br>Deployed with Gunicorn and Nginx
             </p>
         </div>
         <div class="my-info">
             <h4>About me</h4>
-            <p>Hi! I'm James and I <a href="https://letterboxd.com/abrokepcbuilder/" target="_blank">love to watch movies</a>.
+            <p>Hi! I'm James and I <a href="https://letterboxd.com/abrokepcbuilder/" target="_blank">love to watch
+                    movies</a>.
                 I'm currently on a gap year and will matriculate
                 in 2023. If you have any suggestions or find any errors within the site, do let me know on
                 <a href="https://www.reddit.com/user/abrokepcbuilder" target="_blank">Reddit</a>!
             </p>
             <p>
                 I'm also looking for an internship opportunity (remote, unpaid). If you know of any relevant
-                Software Engineering / Web Dev / Data Science internship positions, do 
+                Software Engineering / Web Dev / Data Science internship positions, do
                 <a href="mailto:jamesgwz.work@gmail.com" target="_blank">reach out</a>!
             </p>
         </div>
@@ -170,4 +185,5 @@
     <script src="../static/js/rangeSlider.js"></script>
     <script src="../static/js/script.js" defer></script>
 </body>
+
 </html>

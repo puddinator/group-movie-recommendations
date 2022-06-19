@@ -13,8 +13,8 @@ pd.options.mode.chained_assignment = None  # default='warn'
 def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast):
 
     df_ratings = pd.read_parquet('data/ratings.parquet')
-    if (fast == True):
-        df_ratings = df_ratings[:int(len(df_ratings.index) / 2)]
+    # if (fast == True):
+    #     df_ratings = df_ratings[:int(len(df_ratings.index) / 2)]
     df_movie_info = pd.read_parquet('data/movies.parquet')
 
     counter = 0
@@ -41,7 +41,8 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
         )
         # Filter out other reviewers with insufficient movie matches
         # During the count it creates a copy, causing count number to double (?)
-        df_merged = df_merged[df_merged.groupby('user_id')['rating_user'].transform('count') >= MINIMUM_MATCHES * 2]
+
+        # df_merged = df_merged[df_merged.groupby('user_id')['rating_user'].transform('count') >= MINIMUM_MATCHES * 2]
 
         df_compatibility = (
             # Drop nan in order to calculate mean
