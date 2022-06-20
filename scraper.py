@@ -108,9 +108,7 @@ def scrape_imdb(link, fast):
 
 def extract_single_record_imdb(movie_container):
     reviewed_movie = {}
-    movie_id = movie_container.a.text.lower()
-    movie_id = re.sub(r'([^\s\w]|_)+', '', movie_id)
-    reviewed_movie['movie_id'] = movie_id.replace(" ","-")
+    reviewed_movie['imdb_id'] = movie_container.find('input', class_='ipl-rating-interactive__state')['data-tconst']
     rating = movie_container.find('div', class_='ipl-rating-star--other-user').find('span', class_='ipl-rating-star__rating').text
     reviewed_movie['rating'] = int(rating) * 10
     return reviewed_movie
@@ -118,9 +116,12 @@ def extract_single_record_imdb(movie_container):
 def scrape_many(self, usernames, number_of_accounts, fast):
     reviewed_movies_all = []
     deleted = 0
+    is_imdb = False
+
     for i in range (0, number_of_accounts):
         
         if 'imdb' in usernames[i - deleted]:
+            is_imdb = True
             self.update_state(state='PROGRESS', meta={'status': 'Gathering ur' + usernames[i - deleted].split("ur")[1].split("/")[0] + "'s user data"})
             reviewed_movies = scrape_imdb(usernames[i - deleted], fast)
         else:
@@ -140,6 +141,6 @@ def scrape_many(self, usernames, number_of_accounts, fast):
             reviewed_movies_all.append(reviewed_movies)
         
     # print(reviewed_movies_all)
-    return merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast)
+    return merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast, is_imdb)
 
 # scrape_letterboxd('abrokepcbuilder')

@@ -10,7 +10,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 # print(time.process_time() - start)
         
 
-def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast):
+def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_accounts, fast, is_imdb):
 
     df_ratings = pd.read_parquet('data/ratings.parquet')
     # if (fast == True):
@@ -22,23 +22,36 @@ def merge_for_comparison(self, reviewed_movies_all, usernames, number_of_account
     df_score_merged = pd.DataFrame()
 
     for reviewed_movies in reviewed_movies_all:
-        self.update_state(state='PROGRESS', meta={'status': 'Calculating ' + usernames[counter] + "'s movie scores"})
-
         MINIMUM_MATCHES = len(reviewed_movies) / 2
         MINIMUM_MATCHES_2 = 50 + len(reviewed_movies) / 10
         if (MINIMUM_MATCHES_2 > 80): MINIMUM_MATCHES_2 = 80
         
-        df_merged = (
-            pd.DataFrame(reviewed_movies)
-            # Merge on where movie_id are same
-            .merge(
-                df_ratings, 
-                left_on="movie_id", 
-                right_on="movie_id", 
-                how='right', 
-                suffixes=('_user', '_letterboxd')
+        if (is_imdb == True):
+            self.update_state(state='PROGRESS', meta={'status': 'Calculating ' + usernames[counter].split("ur")[1].split("/")[0] + "'s movie scores"})
+            df_merged = (
+                pd.DataFrame(reviewed_movies)
+                # Merge on where movie_id are same
+                .merge(
+                    df_ratings, 
+                    left_on="imdb_id", 
+                    right_on="imdb_id", 
+                    how='right', 
+                    suffixes=('_user', '_letterboxd')
+                )
             )
-        )
+        else:
+            self.update_state(state='PROGRESS', meta={'status': 'Calculating ' + usernames[counter] + "'s movie scores"})
+            df_merged = (
+                pd.DataFrame(reviewed_movies)
+                # Merge on where movie_id are same
+                .merge(
+                    df_ratings, 
+                    left_on="movie_id", 
+                    right_on="movie_id", 
+                    how='right', 
+                    suffixes=('_user', '_letterboxd')
+                )
+            )
         # Filter out other reviewers with insufficient movie matches
         # During the count it creates a copy, causing count number to double (?)
 
